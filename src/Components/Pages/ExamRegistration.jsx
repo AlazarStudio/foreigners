@@ -179,7 +179,7 @@ const ExamRegistration = () => {
               <TableCell sx={{ textAlign: 'center' }}>Оплачен</TableCell>
               <TableCell sx={{ textAlign: 'center' }}>Услуга оказана</TableCell>
               <TableCell sx={{ textAlign: 'center' }}>Сдал</TableCell>
-              <TableCell sx={{ textAlign: 'center' }}>Работа аннулирована</TableCell>
+              <TableCell sx={{ textAlign: 'center' }}>Аннулировано</TableCell>
               <TableCell sx={{ textAlign: 'center' }}>Действия</TableCell>
             </TableRow>
           </TableHead>
