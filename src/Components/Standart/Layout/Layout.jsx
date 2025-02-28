@@ -1,17 +1,16 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-import Header from "../../Blocks/Header/Header"
-import Footer from "../../Blocks/Footer/Footer";
+import { Box } from '@mui/material';
+import Sidebar from "../Sidebar"
 
 
 function Empty({ children, ...props }) {
     return (
-        <>
-            <Header/>
+        <Box sx={{ p: 2 }}>
+            {/* <Sidebar/> */}
             <Outlet />
-            <Footer/>
-        </>
+        </Box>
     );
 }
 
