@@ -7,6 +7,7 @@ const ExamResultsModal = ({ open, onClose, studentData, onSaveResults }) => {
   const [arrived, setArrived] = useState(false);
   const [serviceProvided, setServiceProvided] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [examOption, setExamOption] = useState();
 
   useEffect(() => {
     if (open && studentData) {
@@ -15,6 +16,7 @@ const ExamResultsModal = ({ open, onClose, studentData, onSaveResults }) => {
       setArrived(studentData.arrived || false);
       setServiceProvided(studentData.serviceProvided || false);
       setPaid(studentData.paid || false);
+      setExamOption(studentData.examOption || '');
     }
   }, [open, studentData]);
 
@@ -46,61 +48,88 @@ const ExamResultsModal = ({ open, onClose, studentData, onSaveResults }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle sx={{ textAlign: 'center' }}>Результаты тестирования для {studentData?.fioCyrillic}</DialogTitle>
-      <DialogContent>
-        <Box display="flex" justifyContent="space-between" gap={2}>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '10px' }}>
+        <span>Результаты экзамена <b>{studentData?.fioCyrillic}</b></span>
+        <TextField
+          label="Вариант экзамена"
+          type="text"
+          value={examOption}
+          onChange={(e) => setExamOption(e.target.value)}
+          size="small"
+          sx={{ ml: 1, width: "280px" }}
+        />
 
+      </DialogTitle>
+      <DialogContent>
+        <Box display="flex" flexDirection={"column"} justifyContent="space-between" gap={2}>
           {/* Русский язык */}
           <Box flex={1} p={2} sx={{ textAlign: 'center', border: '1px solid #ececec', borderRadius: '5px' }}>
-            <Typography variant="h6">Русский язык</Typography>
-            {Array.from({ length: 9 }, (_, index) => (
-              <Box key={index} display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                <Typography>{index + 1}</Typography>
-                <TextField
-                  type="number"
-                  value={results[index]}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  inputProps={{ min: 0, max: 1 }}
-                  size="small"
-                />
-              </Box>
-            ))}
+            <Typography variant="h6" mb={2}>Русский язык</Typography>
+
+            <Box display="flex" justifyContent="space-between">
+              {Array.from({ length: 9 }, (_, index) => (
+                <Box key={index} mb={1}>
+                  <Typography>{index + 1}</Typography>
+                  <TextField
+                    type="number"
+                    value={results[index]}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    inputProps={{ min: 0, max: 1 }}
+                    size="small"
+                  />
+                </Box>
+              ))}
+            </Box>
           </Box>
 
-          {/* История */}
-          <Box flex={1} p={2} sx={{ textAlign: 'center', border: '1px solid #ececec', borderRadius: '5px' }}>
-            <Typography variant="h6">История</Typography>
-            {Array.from({ length: 5 }, (_, index) => (
-              <Box key={index} display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                <Typography>{index + 10}</Typography>
-                <TextField
-                  type="number"
-                  value={results[index + 9]}
-                  onChange={(e) => handleInputChange(index + 9, e.target.value)}
-                  inputProps={{ min: 0, max: 1 }}
-                  size="small"
-                />
-              </Box>
-            ))}
-          </Box>
+          <Box display="flex" justifyContent="space-between" gap={2}>
+            {/* История */}
+            <Box flex={1} p={2} sx={{ textAlign: 'center', border: '1px solid #ececec', borderRadius: '5px' }}>
+              <Typography variant="h6" mb={2}>История</Typography>
 
-          {/* Законодательство */}
-          <Box flex={1} p={2} sx={{ textAlign: 'center', border: '1px solid #ececec', borderRadius: '5px' }}>
-            <Typography variant="h6">Законодательство</Typography>
-            {Array.from({ length: 6 }, (_, index) => (
-              <Box key={index} display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                <Typography>{index + 15}</Typography>
-                <TextField
-                  type="number"
-                  value={results[index + 14]}
-                  onChange={(e) => handleInputChange(index + 14, e.target.value)}
-                  inputProps={{ min: 0, max: 1 }}
-                  size="small"
-                />
+              <Box display="flex" justifyContent="space-between">
+                {Array.from({ length: 5 }, (_, index) => (
+                  <Box key={index} mb={1}>
+                    <Typography>{index + 10}</Typography>
+                    <TextField
+                      type="number"
+                      value={results[index + 9]}
+                      onChange={(e) => handleInputChange(index + 9, e.target.value)}
+                      inputProps={{ min: 0, max: 1 }}
+                      size="small"
+                      sx={{
+                        width: '60px',
+                      }}
+                    />
+                  </Box>
+                ))}
               </Box>
-            ))}
-          </Box>
+            </Box>
 
+            {/* Законодательство */}
+            <Box flex={1} p={2} sx={{ textAlign: 'center', border: '1px solid #ececec', borderRadius: '5px' }}>
+              <Typography variant="h6" mb={2}>Законодательство</Typography>
+
+              <Box display="flex" justifyContent="space-between" gap={'12px'}>
+                {Array.from({ length: 6 }, (_, index) => (
+                  <Box key={index} mb={1}>
+                    <Typography>{index + 15}</Typography>
+                    <TextField
+                      type="number"
+                      value={results[index + 14]}
+                      onChange={(e) => handleInputChange(index + 14, e.target.value)}
+                      inputProps={{ min: 0, max: 1 }}
+                      size="small"
+                      sx={{
+                        width: '60px',
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+          </Box>
         </Box>
 
         {/* Итоговый блок */}
@@ -137,7 +166,7 @@ const ExamResultsModal = ({ open, onClose, studentData, onSaveResults }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Отменить</Button>
-        <Button onClick={() => onSaveResults(studentData.passportNumber, results, passed, arrived, serviceProvided, paid)} variant="contained" color="primary">Сохранить</Button>
+        <Button onClick={() => onSaveResults(studentData.passportNumber, results, passed, arrived, serviceProvided, paid, examOption)} variant="contained" color="primary">Сохранить</Button>
       </DialogActions>
     </Dialog>
   );
