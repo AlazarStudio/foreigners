@@ -253,7 +253,7 @@ const ExamRegistration = () => {
           size="small"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: "800px" }}
+          sx={{ width: "500px" }}
         />
 
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
