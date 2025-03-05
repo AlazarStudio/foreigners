@@ -16,6 +16,8 @@ const ExamRegistration = () => {
   const [selectedStudent, setSelectedStudent] = useState(null); // Данные выбранного студента
   const [editingData, setEditingData] = useState(null); // Данные редактируемого студента
   const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Состояния формы
   const [fioCyrillic, setFioCyrillic] = useState('');
@@ -178,13 +180,44 @@ const ExamRegistration = () => {
     return `${day}.${month}.${year}`;
   };
 
+  const filteredData = useMemo(() => {
+    return data.filter(student => {
+      // Фильтрация только по активным колонкам
+      const isWithinSearch = Object.keys(visibleColumns)
+        .filter(key => visibleColumns[key]) // Учитываем только видимые колонки
+        .some(key => {
+          let value = student[key];
+
+          // Преобразование логических значений в строки "Да" / "Нет"
+          if (typeof value === 'boolean') {
+            value = value ? "Да" : "Нет";
+          }
+
+          return value && value.toString().toLowerCase().includes(searchQuery.toLowerCase());
+        });
+
+      // Фильтрация по диапазону дат
+      const studentDate = new Date(student.registrationDate);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+
+      const isWithinDateRange =
+        (!start && !end) || // Если даты не выбраны - ничего не фильтруем
+        (!start || studentDate >= start) &&
+        (!end || studentDate <= end);
+
+      return isWithinSearch && isWithinDateRange;
+    });
+  }, [data, searchQuery, startDate, endDate, visibleColumns]);
+
+  // Сортировка данных
   const sortedData = useMemo(() => {
-    return [...data].sort((a, b) => {
+    return [...filteredData].sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
       if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, sortConfig]);
+  }, [filteredData, sortConfig]);
 
   // Функция для сортировки данных
   const handleSort = (key) => {
@@ -219,17 +252,8 @@ const ExamRegistration = () => {
     examOption: 'Вариант'
   };
 
-  const filteredData = sortedData.filter((student) =>
-    Object.keys(visibleColumns)
-      .filter((key) => visibleColumns[key]) // Оставляем только активные колонки
-      .some((key) => {
-        const value = key.includes("Date") ? formatDateToRussian(student[key]) : student[key]?.toString();
-        return value?.toLowerCase().includes(searchQuery.toLowerCase());
-      })
-  );
-
   return (
-    <div>
+    <>
       <Typography display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Список записей на экзамен</Typography>
         <Button variant="contained" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
@@ -247,14 +271,33 @@ const ExamRegistration = () => {
       </Typography>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} mt={4}>
-        <TextField
-          label="Поиск"
-          variant="outlined"
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: "500px" }}
-        />
+        <Box display="flex" gap={2}>
+          <TextField
+            label="Поиск"
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: "500px" }}
+          />
+
+          <TextField
+            label="От (дата записи)"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            size="small"
+          />
+          <TextField
+            label="До (дата записи)"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            size="small"
+          />
+        </Box>
 
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
           Добавить запись
@@ -362,7 +405,7 @@ const ExamRegistration = () => {
           </TableHead>
 
           <TableBody>
-            {filteredData.map((row) => (
+            {sortedData.map((row) => (
               <TableRow key={row.passportNumber} sx={{
                 backgroundColor: row.arrived && row.paid && row.serviceProvided && row.passed ? 'rgba(60, 188, 103, 0.15)' : '#fff'
               }}>
@@ -447,7 +490,7 @@ const ExamRegistration = () => {
         studentData={selectedStudent}
         onSaveResults={saveResults}
       />
-    </div >
+    </>
   );
 };
 
