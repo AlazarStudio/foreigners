@@ -335,7 +335,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
           />
 
           <TextField
-            label="От (дата записи)"
+            label="От (дата экзамена)"
             type="date"
             InputLabelProps={{ shrink: true }}
             value={startDate}
@@ -343,7 +343,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
             size="small"
           />
           <TextField
-            label="До (дата записи)"
+            label="До (дата экзамена)"
             type="date"
             InputLabelProps={{ shrink: true }}
             value={endDate}

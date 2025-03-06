@@ -178,7 +178,7 @@ const ReportModal = ({ open, onClose, data }) => {
             <DialogContent>
                 <Box display="flex" flexDirection="column" gap={2}>
                     <TextField
-                        label="От (дата)"
+                        label="От (дата экзамена)"
                         type="date"
                         InputLabelProps={{ shrink: true }}
                         value={startDate}
@@ -187,7 +187,7 @@ const ReportModal = ({ open, onClose, data }) => {
                         sx={{ marginTop: '10px' }}
                     />
                     <TextField
-                        label="До (дата)"
+                        label="До (дата экзамена)"
                         type="date"
                         InputLabelProps={{ shrink: true }}
                         value={endDate}
