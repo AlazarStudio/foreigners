@@ -166,7 +166,7 @@ const ExamResultsModal = ({ open, onClose, studentData, onSaveResults }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Отменить</Button>
-        <Button onClick={() => onSaveResults(studentData.passportNumber, results, passed, arrived, serviceProvided, paid, examOption)} variant="contained" color="primary">Сохранить</Button>
+        <Button onClick={() => onSaveResults(studentData, studentData.passportNumber, results, passed, arrived, serviceProvided, paid, examOption)} variant="contained" color="primary">Сохранить</Button>
       </DialogActions>
     </Dialog>
   );

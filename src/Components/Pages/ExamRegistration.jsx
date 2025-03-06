@@ -10,10 +10,11 @@ import FactCheckIcon from '@mui/icons-material/FactCheck';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
-import { examsData } from '../../data';
+import { DELETE_fetchRequest, POST_fetchRequest, PUT_fetchRequest } from '../../data';
+// import { examsData } from '../../data';
 
-const ExamRegistration = () => {
-  const [data, setData] = useState(examsData);
+const ExamRegistration = ({ groupSchedulesFetch }) => {
+  const [data, setData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openResultsModal, setOpenResultsModal] = useState(false); // Состояние для открытия модального окна с результатами
   const [selectedStudent, setSelectedStudent] = useState(null); // Данные выбранного студента
@@ -21,6 +22,10 @@ const ExamRegistration = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  useEffect(() => {
+    setData(groupSchedulesFetch)
+  }, [groupSchedulesFetch]);
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
@@ -124,11 +129,10 @@ const ExamRegistration = () => {
     setServiceProvided(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const examOption = "";
 
     const newData = {
-      id: editingData ? editingData.id : Date.now(),
       fioCyrillic,
       fioLatin,
       passportNumber,
@@ -159,18 +163,22 @@ const ExamRegistration = () => {
           student.id === editingData.id ? newData : student
         )
       );
+      await PUT_fetchRequest(newData, 'exam', editingData.id);
+      
     } else {
-      // console.log(newData);
-      setData([...data, newData]);
+      let result = await POST_fetchRequest(newData, 'exam');
+      setData([...data, result]);
     }
 
     clearForm();
     handleCloseModal();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
       setData(data.filter(item => item.id !== id));
+
+      await DELETE_fetchRequest(id, 'exam');
     }
   };
 
@@ -184,7 +192,13 @@ const ExamRegistration = () => {
     setSelectedStudent(null);
   };
 
-  const saveResults = (passportNumber, results, passed, arrived, serviceProvided, paid, examOption) => {
+  const saveResults = async (studentData, passportNumber, results, passed, arrived, serviceProvided, paid, examOption) => {
+    
+    let dataExamInfo = { ...studentData, results, passed, arrived, serviceProvided, paid, examOption }
+    const { id, ...dataExamInfoPUT } = dataExamInfo;
+
+    await PUT_fetchRequest(dataExamInfoPUT, 'exam', dataExamInfo.id);
+
     setData(prevData =>
       prevData.map(student =>
         student.passportNumber === passportNumber
@@ -494,16 +508,19 @@ const ExamRegistration = () => {
           <TextField label="Дата экзамена" type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
 
           {/* Автодополнение для ФИО (Кириллица) */}
-          <Autocomplete
-            freeSolo
-            options={uniqueStudents}
-            getOptionLabel={(option) => option.fioCyrillic}
-            onChange={handleSelectStudent}
-            renderInput={(params) => (
-              <TextField {...params} label="ФИО (Кириллица)" value={fioCyrillic} onChange={(e) => setFioCyrillic(e.target.value)} fullWidth margin="dense" />
-            )}
-          />
-
+          {!editingData ?
+            <Autocomplete
+              freeSolo
+              options={uniqueStudents}
+              getOptionLabel={(option) => option.fioCyrillic}
+              onChange={handleSelectStudent}
+              renderInput={(params) => (
+                <TextField {...params} label="ФИО (Кириллица)" value={fioCyrillic} onChange={(e) => setFioCyrillic(e.target.value)} fullWidth margin="dense" />
+              )}
+            />
+            :
+            <TextField label="ФИО (Кириллица)" value={fioCyrillic} onChange={(e) => setFioCyrillic(e.target.value)} fullWidth margin="dense" />
+          }
           <TextField label="ФИО (Латиница)" value={fioLatin} onChange={(e) => setFioLatin(e.target.value)} fullWidth margin="dense" />
           <TextField label="Текущая попытка" value={examTry ? examTry : 1} onChange={(e) => setExamTry(e.target.value)} fullWidth margin="dense" disabled />
 
@@ -557,7 +574,7 @@ const ExamRegistration = () => {
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
         {Object.keys(visibleColumns).map((key) => (
-          <MenuItem key={key} onClick={() => toggleColumn(key)} sx={{padding: '0px', width: '218px'}}>
+          <MenuItem key={key} onClick={() => toggleColumn(key)} sx={{ padding: '0px', width: '218px' }}>
             <ListItemIcon>
               <Checkbox checked={visibleColumns[key]} />
             </ListItemIcon>
