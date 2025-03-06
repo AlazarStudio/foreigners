@@ -5,6 +5,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExamResultsModal from './ExamResultsModal';
+import ReportModal from './ReportModal';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
@@ -19,6 +20,8 @@ const ExamRegistration = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  const [reportModalOpen, setReportModalOpen] = useState(false);
 
   // Состояния формы
   const [fioCyrillic, setFioCyrillic] = useState('');
@@ -279,7 +282,6 @@ const ExamRegistration = () => {
     return Array.from(map.values());
   }, [data]);
 
-  // Заполнение данных студента при выборе из списка
   const handleSelectStudent = (event, selectedStudent) => {
     if (selectedStudent) {
       setFioCyrillic(selectedStudent.fioCyrillic);
@@ -293,13 +295,16 @@ const ExamRegistration = () => {
       setExamTry(attempts);
     }
   };
-  
-  console.log(uniqueStudents);
 
   return (
     <>
       <Typography display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Список записей на экзамен</Typography>
+        <div>
+          <Button variant="contained" color="secondary" onClick={() => setReportModalOpen(true)}>
+            Создать отчет
+          </Button>
+        </div>
         <Button variant="contained" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
@@ -509,7 +514,7 @@ const ExamRegistration = () => {
             )}
           />
 
-          <TextField label="ФИО (Латиница)" value={fioLatin} onChange={(e) => setFioLatin(e.target.value)} fullWidth margin="dense" /> 
+          <TextField label="ФИО (Латиница)" value={fioLatin} onChange={(e) => setFioLatin(e.target.value)} fullWidth margin="dense" />
           <TextField label="Текущая попытка" value={examTry ? examTry : 1} onChange={(e) => setExamTry(e.target.value)} fullWidth margin="dense" disabled />
 
           <TextField
@@ -556,6 +561,9 @@ const ExamRegistration = () => {
         studentData={selectedStudent}
         onSaveResults={saveResults}
       />
+
+      {/* Модальное окно для выбора отчета */}
+      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} data={data}/>
     </>
   );
 };
