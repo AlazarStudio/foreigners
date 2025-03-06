@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, FormControlLabel, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Checkbox } from '@mui/material';
 import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExamResultsModal from './ExamResultsModal';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
+import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
 import { examsData } from '../../data';
 
@@ -57,6 +58,13 @@ const ExamRegistration = () => {
   const openMenu = (event) => setAnchorEl(event.currentTarget);
   const closeMenu = () => setAnchorEl(null);
 
+  const clearFilters = () => {
+    setSearchQuery('');
+    setStartDate('');
+    setEndDate('');
+    setSortConfig({ key: 'registrationDate', direction: 'desc' });
+  };
+
   const handleOpenModal = (student = null) => {
     if (student) {
       setEditingData(student);
@@ -80,6 +88,14 @@ const ExamRegistration = () => {
     }
     setOpenModal(true);
   };
+
+  useEffect(() => {
+    if (!editingData) {
+      // Если создается новая запись, устанавливаем сегодняшнюю дату
+      const today = new Date().toISOString().split('T')[0]; // Формат YYYY-MM-DD
+      setRegistrationDate(today);
+    }
+  }, [openModal, editingData]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -105,18 +121,6 @@ const ExamRegistration = () => {
   };
 
   const handleSave = () => {
-    // Ищем студента с тем же ФИО, номером паспорта и датой рождения
-    const existingStudent = data.find(student =>
-      student.fioCyrillic.toLocaleLowerCase() === fioCyrillic.toLocaleLowerCase() &&
-      student.fioLatin.toLocaleLowerCase() === fioLatin.toLocaleLowerCase() &&
-      student.passportNumber.toLocaleLowerCase() === passportNumber.toLocaleLowerCase() &&
-      student.birthDate === birthDate
-    );
-
-    // console.log(existingStudent)
-
-    // Устанавливаем количество попыток (1, если новый студент, иначе +1)
-    const examTry = existingStudent ? existingStudent.examTry + 1 : 1;
     const examOption = "";
 
     const newData = {
@@ -297,6 +301,15 @@ const ExamRegistration = () => {
             onChange={(e) => setEndDate(e.target.value)}
             size="small"
           />
+
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<ClearIcon />}
+            onClick={clearFilters}
+          >
+            Очистить фильтры
+          </Button>
         </Box>
 
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
@@ -417,7 +430,7 @@ const ExamRegistration = () => {
                 {visibleColumns.passportNumber && <TableCell>{row.passportNumber}</TableCell>}
                 {visibleColumns.birthDate && <TableCell>{formatDateToRussian(row.birthDate)}</TableCell>}
                 {visibleColumns.phone && <TableCell>{row.phone}</TableCell>}
-                {visibleColumns.examTry && <TableCell sx={{ textAlign: 'center' }}>{row.examTry ? row.examTry : 1}</TableCell>}
+                {visibleColumns.examTry && <TableCell sx={{ textAlign: 'center' }}>{row.examTry}</TableCell>}
                 {visibleColumns.arrived && <TableCell sx={{ textAlign: 'center' }}>{row.arrived ? 'Да' : 'Нет'}</TableCell>}
                 {visibleColumns.paid && <TableCell sx={{ textAlign: 'center' }}>{row.paid ? 'Да' : 'Нет'}</TableCell>}
                 {visibleColumns.serviceProvided && <TableCell sx={{ textAlign: 'center' }}>{row.serviceProvided ? 'Да' : 'Нет'}</TableCell>}
