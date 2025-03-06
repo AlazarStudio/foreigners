@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, FormControlLabel, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Checkbox } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, FormControlLabel, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Checkbox, Autocomplete } from '@mui/material';
 import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
@@ -125,8 +125,21 @@ const ExamRegistration = () => {
 
     const newData = {
       id: editingData ? editingData.id : Date.now(),
-      fioCyrillic, fioLatin, passportNumber, birthDate, examType, examTry, phone,
-      registrationDate, examDate, arrived, workAnnulled, passed, paid, serviceProvided, examOption,
+      fioCyrillic,
+      fioLatin,
+      passportNumber,
+      birthDate,
+      examType,
+      examTry: examTry ? examTry : 1,
+      phone,
+      registrationDate,
+      examDate,
+      arrived,
+      workAnnulled,
+      passed,
+      paid,
+      serviceProvided,
+      examOption,
       results: editingData ? editingData.results : Array(20).fill(0) // Сохраняем старые оценки
     };
 
@@ -255,6 +268,33 @@ const ExamRegistration = () => {
     workAnnulled: "Аннулировано",
     examOption: 'Вариант'
   };
+
+  const uniqueStudents = useMemo(() => {
+    const map = new Map();
+    data.forEach(student => {
+      if (!map.has(student.passportNumber)) {
+        map.set(student.passportNumber, student);
+      }
+    });
+    return Array.from(map.values());
+  }, [data]);
+
+  // Заполнение данных студента при выборе из списка
+  const handleSelectStudent = (event, selectedStudent) => {
+    if (selectedStudent) {
+      setFioCyrillic(selectedStudent.fioCyrillic);
+      setFioLatin(selectedStudent.fioLatin);
+      setPassportNumber(selectedStudent.passportNumber);
+      setBirthDate(selectedStudent.birthDate);
+      setPhone(selectedStudent.phone);
+
+      // Определяем количество попыток (увеличиваем, если студент уже есть)
+      const attempts = data.filter(s => s.fioCyrillic === selectedStudent.fioCyrillic).length + 1;
+      setExamTry(attempts);
+    }
+  };
+  
+  console.log(uniqueStudents);
 
   return (
     <>
@@ -457,8 +497,21 @@ const ExamRegistration = () => {
         <DialogContent>
           <TextField label="Дата записи" type="date" value={registrationDate} onChange={(e) => setRegistrationDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
           <TextField label="Дата экзамена" type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
-          <TextField label="ФИО (Кириллица)" value={fioCyrillic} onChange={(e) => setFioCyrillic(e.target.value)} fullWidth margin="dense" />
-          <TextField label="ФИО (Латиница)" value={fioLatin} onChange={(e) => setFioLatin(e.target.value)} fullWidth margin="dense" />
+
+          {/* Автодополнение для ФИО (Кириллица) */}
+          <Autocomplete
+            freeSolo
+            options={uniqueStudents}
+            getOptionLabel={(option) => option.fioCyrillic}
+            onChange={handleSelectStudent}
+            renderInput={(params) => (
+              <TextField {...params} label="ФИО (Кириллица)" value={fioCyrillic} onChange={(e) => setFioCyrillic(e.target.value)} fullWidth margin="dense" />
+            )}
+          />
+
+          <TextField label="ФИО (Латиница)" value={fioLatin} onChange={(e) => setFioLatin(e.target.value)} fullWidth margin="dense" /> 
+          <TextField label="Текущая попытка" value={examTry ? examTry : 1} onChange={(e) => setExamTry(e.target.value)} fullWidth margin="dense" disabled />
+
           <TextField
             select
             value={examType}
@@ -480,9 +533,9 @@ const ExamRegistration = () => {
           <TextField label="Дата рождения" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
           <TextField label="Телефон" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth margin="dense" />
 
+
           {editingData &&
             <>
-              {/* <TextField label="Попытка" value={examTry} onChange={(e) => setExamTry(e.target.value)} fullWidth margin="dense" /> */}
               <FormControlLabel control={<Checkbox checked={arrived} onChange={(e) => setArrived(e.target.checked)} />} label="Явился" />
               <FormControlLabel control={<Checkbox checked={paid} onChange={(e) => setPaid(e.target.checked)} />} label="Оплачен" />
               <FormControlLabel control={<Checkbox checked={serviceProvided} onChange={(e) => setServiceProvided(e.target.checked)} />} label="Услуга оказана" />
