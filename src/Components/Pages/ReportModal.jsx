@@ -74,7 +74,6 @@ const ReportModal = ({ open, onClose, data }) => {
         let result = await POST_fetchRequest(data, 'report');
     };
 
-    
     const generateReport3 = (filteredData) => {
         // Оставляем только тех, кто не сдал экзамен
         const failedStudents = filteredData.filter(student => !student.passed);
@@ -146,62 +145,6 @@ const ReportModal = ({ open, onClose, data }) => {
     
         console.log("\nПолная статистика по блокам:", blocks);
     };
-
-    // const generateReport3 = (filteredData) => {
-    //     // Оставляем только тех, кто не сдал экзамен
-    //     const failedStudents = filteredData.filter(student => !student.passed);
-
-    //     // Создаем массив для подсчета правильных ответов по каждому из 20 вопросов
-    //     const questionAnalysis = new Array(20).fill(0);
-
-    //     // Проходим по каждому студенту и суммируем правильные ответы по каждому вопросу
-    //     failedStudents.forEach(student => {
-    //         student.results.forEach((answer, index) => {
-    //             if (answer === 1) {
-    //                 questionAnalysis[index]++; // Увеличиваем счетчик для вопроса, если ответ правильный
-    //             }
-    //         });
-    //     });
-
-    //     console.log("📊 Отчет 3 - Анализ вопросов среди не сдавших:");
-    //     questionAnalysis.forEach((count, index) => {
-    //         console.log(`Вопрос ${index + 1}: ${count} правильных ответов`);
-    //     });
-
-    //     console.log("Общая статистика по вопросам:", questionAnalysis);
-    // };
-
-    // const generateReport4 = (filteredData) => {
-    //     // Оставляем только тех, кто не сдал экзамен
-    //     const failedStudents = filteredData.filter(student => !student.passed);
-
-    //     // Блоки заданий с правильными диапазонами вопросов
-    //     const blocks = {
-    //         "Русский язык": { range: [0, 8], stats: new Array(10).fill(0) }, // 10 вариантов (0-9 правильных ответов)
-    //         "История России": { range: [9, 13], stats: new Array(6).fill(0) }, // 6 вариантов (0-5)
-    //         "Основы законодательства РФ": { range: [14, 19], stats: new Array(7).fill(0) } // 7 вариантов (0-6)
-    //     };
-
-    //     // Подсчитываем, сколько правильных ответов в каждом блоке
-    //     failedStudents.forEach(student => {
-    //         Object.keys(blocks).forEach(block => {
-    //             const [start, end] = blocks[block].range;
-    //             const correctAnswers = student.results.slice(start, end + 1).filter(answer => answer === 1).length;
-    //             blocks[block].stats[correctAnswers]++;
-    //         });
-    //     });
-
-    //     // Выводим отчет в консоль
-    //     console.log("📊 Отчет 4 - Анализ неуспешных попыток по блокам заданий:");
-    //     Object.keys(blocks).forEach(block => {
-    //         console.log(`\n${block}:`);
-    //         blocks[block].stats.forEach((count, correctAnswers) => {
-    //             console.log(`Студенты, давшие верный ответ на ${correctAnswers} заданий: ${count}`);
-    //         });
-    //     });
-
-    //     console.log("\nПолная статистика:", blocks);
-    // };
 
     const handleGenerateReport = () => {
         switch (reportType) {
