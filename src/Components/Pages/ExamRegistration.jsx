@@ -44,9 +44,9 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
   const [passed, setPassed] = useState(false);
   const [paid, setPaid] = useState(false);
   const [serviceProvided, setServiceProvided] = useState(false);
-  const [sortConfig, setSortConfig] = useState({ key: 'registrationDate', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'examDate', direction: 'desc' });
   const [visibleColumns, setVisibleColumns] = useState({
-    registrationDate: true,
+    registrationDate: false,
     examDate: true,
     fioCyrillic: true,
     fioLatin: false,
@@ -71,7 +71,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
     setSearchQuery('');
     setStartDate('');
     setEndDate('');
-    setSortConfig({ key: 'registrationDate', direction: 'desc' });
+    setSortConfig({ key: 'examDate', direction: 'desc' });
   };
 
   const handleOpenModal = (student = null) => {
@@ -152,7 +152,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
     };
 
     // Проверка на пустые обязательные поля
-    if (!fioCyrillic || !fioLatin || !passportNumber || !examType || !phone || !registrationDate || !examDate) {
+    if (!fioCyrillic || !fioLatin || !passportNumber || !examType || !phone || !examDate) {
       alert('Пожалуйста, заполните все обязательные поля.');
       return;
     }
@@ -164,7 +164,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
         )
       );
       await PUT_fetchRequest(newData, 'exam', editingData.id);
-      
+
     } else {
       let result = await POST_fetchRequest(newData, 'exam');
       setData([...data, result]);
@@ -193,7 +193,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
   };
 
   const saveResults = async (studentData, passportNumber, results, passed, arrived, serviceProvided, paid, examOption) => {
-    
+
     let dataExamInfo = { ...studentData, results, passed, arrived, serviceProvided, paid, examOption }
     const { id, ...dataExamInfoPUT } = dataExamInfo;
 
@@ -232,7 +232,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
         });
 
       // Фильтрация по диапазону дат
-      const studentDate = new Date(student.registrationDate);
+      const studentDate = new Date(student.examDate);
       const start = startDate ? new Date(startDate) : null;
       const end = endDate ? new Date(endDate) : null;
 
@@ -314,7 +314,10 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
   return (
     <>
       <Typography display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">Список записей на экзамен</Typography>
+        <Box display="flex" gap={2}>
+          <Typography variant="h5">Список записей на экзамен</Typography>
+          <Button variant="outline" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
+        </Box>
         <Button startIcon={<InsertChartIcon />} variant="contained" color="primary" onClick={() => setReportModalOpen(true)}>
           Создать отчет
         </Button>
@@ -362,7 +365,6 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
           <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
             Добавить запись
           </Button>
-          <Button variant="contained" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
         </Box>
       </Box>
 
@@ -504,7 +506,7 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
       <Dialog open={openModal} onClose={handleCloseModal} >
         <DialogTitle>{editingData ? 'Редактировать запись' : 'Добавить запись'}</DialogTitle>
         <DialogContent>
-          <TextField label="Дата записи" type="date" value={registrationDate} onChange={(e) => setRegistrationDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
+          <TextField sx={{ display: 'none' }} label="Дата записи" type="date" value={registrationDate} onChange={(e) => setRegistrationDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
           <TextField label="Дата экзамена" type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
 
           {/* Автодополнение для ФИО (Кириллица) */}

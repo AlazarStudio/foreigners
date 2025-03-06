@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { POST_fetchRequest } from '../../data';
 
 const ReportModal = ({ open, onClose, data }) => {
     const [startDate, setStartDate] = useState('');
@@ -8,7 +9,7 @@ const ReportModal = ({ open, onClose, data }) => {
     const [reportType, setReportType] = useState('');
 
     const filteredData = data.filter(student => {
-        const studentDate = new Date(student.registrationDate);
+        const studentDate = new Date(student.examDate);
         const start = new Date(startDate);
         const end = new Date(endDate);
 
@@ -19,7 +20,7 @@ const ReportModal = ({ open, onClose, data }) => {
         );
     });
 
-    const generateReport1 = (filteredData) => {
+    const generateReport1 = async (filteredData) => {
         const totalStudents = filteredData.length;
         const passedStudents = filteredData.filter(student => student.passed).length;
         const failedStudents = totalStudents - passedStudents;
@@ -27,10 +28,22 @@ const ReportModal = ({ open, onClose, data }) => {
         const passedPercentage = totalStudents > 0 ? ((passedStudents / totalStudents) * 100).toFixed(2) : "0.00";
         const failedPercentage = totalStudents > 0 ? ((failedStudents / totalStudents) * 100).toFixed(2) : "0.00";
 
-        console.log("📊 Отчет 1 - Итоговая статистика:");
-        console.log(`Общее количество сдающих: ${totalStudents}`);
-        console.log(`Успешно сдали: ${passedStudents} (${passedPercentage}%)`);
-        console.log(`Не сдали: ${failedStudents} (${failedPercentage}%)`);
+        let data = {
+            type: reportType,
+            report: {
+                startDate,
+                endDate,
+                examLevel,
+                totalStudents,
+                passedStudents,
+                failedStudents,
+                passedPercentage,
+                failedPercentage,
+            },
+        }
+
+        let result = await POST_fetchRequest(data, 'report');
+        console.log(result)
     };
 
     const generateReport2 = (filteredData) => {
@@ -80,14 +93,14 @@ const ReportModal = ({ open, onClose, data }) => {
     const generateReport4 = (filteredData) => {
         // Оставляем только тех, кто не сдал экзамен
         const failedStudents = filteredData.filter(student => !student.passed);
-    
+
         // Блоки заданий с правильными диапазонами вопросов
         const blocks = {
             "Русский язык": { range: [0, 8], stats: new Array(10).fill(0) }, // 10 вариантов (0-9 правильных ответов)
             "История России": { range: [9, 13], stats: new Array(6).fill(0) }, // 6 вариантов (0-5)
             "Основы законодательства РФ": { range: [14, 19], stats: new Array(7).fill(0) } // 7 вариантов (0-6)
         };
-    
+
         // Подсчитываем, сколько правильных ответов в каждом блоке
         failedStudents.forEach(student => {
             Object.keys(blocks).forEach(block => {
@@ -96,7 +109,7 @@ const ReportModal = ({ open, onClose, data }) => {
                 blocks[block].stats[correctAnswers]++;
             });
         });
-    
+
         // Выводим отчет в консоль
         console.log("📊 Отчет 4 - Анализ неуспешных попыток по блокам заданий:");
         Object.keys(blocks).forEach(block => {
@@ -105,18 +118,11 @@ const ReportModal = ({ open, onClose, data }) => {
                 console.log(`Студенты, давшие верный ответ на ${correctAnswers} заданий: ${count}`);
             });
         });
-    
+
         console.log("\nПолная статистика:", blocks);
     };
-    
-    
 
     const handleGenerateReport = () => {
-        console.log("Создание отчета с параметрами:");
-        console.log("Дата от:", startDate);
-        console.log("Дата до:", endDate);
-        console.log("Уровень экзамена:", examLevel);
-
         switch (reportType) {
             case "1":
                 generateReport1(filteredData);
