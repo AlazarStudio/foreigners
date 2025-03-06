@@ -9,6 +9,7 @@ import ReportModal from './ReportModal';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { examsData } from '../../data';
 
 const ExamRegistration = () => {
@@ -300,23 +301,9 @@ const ExamRegistration = () => {
     <>
       <Typography display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Список записей на экзамен</Typography>
-        <div>
-          <Button variant="contained" color="secondary" onClick={() => setReportModalOpen(true)}>
-            Создать отчет
-          </Button>
-        </div>
-        <Button variant="contained" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
-
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
-          {Object.keys(visibleColumns).map((key) => (
-            <MenuItem key={key} onClick={() => toggleColumn(key)}>
-              <ListItemIcon>
-                <Checkbox checked={visibleColumns[key]} />
-              </ListItemIcon>
-              <ListItemText primary={columnNames[key]} />
-            </MenuItem>
-          ))}
-        </Menu>
+        <Button startIcon={<InsertChartIcon />} variant="contained" color="primary" onClick={() => setReportModalOpen(true)}>
+          Создать отчет
+        </Button>
       </Typography>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} mt={4}>
@@ -357,9 +344,12 @@ const ExamRegistration = () => {
           </Button>
         </Box>
 
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
-          Добавить запись
-        </Button>
+        <Box display="flex" gap={2}>
+          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
+            Добавить запись
+          </Button>
+          <Button variant="contained" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
+        </Box>
       </Box>
 
       <TableContainer sx={{ maxHeight: "calc(100dvh - 180px)", overflow: "auto", textAlign: 'center', border: '1px solid #ececec', borderRadius: '5px', backgroundColor: '#fff' }}>
@@ -563,7 +553,18 @@ const ExamRegistration = () => {
       />
 
       {/* Модальное окно для выбора отчета */}
-      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} data={data}/>
+      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} data={data} />
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
+        {Object.keys(visibleColumns).map((key) => (
+          <MenuItem key={key} onClick={() => toggleColumn(key)} sx={{padding: '0px', width: '218px'}}>
+            <ListItemIcon>
+              <Checkbox checked={visibleColumns[key]} />
+            </ListItemIcon>
+            <ListItemText primary={columnNames[key]} />
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   );
 };
