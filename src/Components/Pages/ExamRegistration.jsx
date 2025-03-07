@@ -12,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import { DELETE_fetchRequest, GET_fetchRequest, POST_fetchRequest, PUT_fetchRequest, adress } from '../../data';
 
@@ -329,18 +330,19 @@ const ExamRegistration = ({ examData }) => {
     }
   };
 
+  const handleExit = () => {
+    localStorage.clear();
+    window.location.reload();
+  }
   return (
     <>
       <Typography display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Box display="flex" gap={2}>
           <Typography variant="h5">Список записей на экзамен</Typography>
-          <Button variant="outline" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
+          <Button variant="outlined" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
         </Box>
 
-        <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
-          Открыть список отчетов
-        </Button>
-
+        <Button variant="outlined" color="primary" startIcon={<LogoutIcon />} onClick={handleExit}>Выход</Button>
       </Typography>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} mt={4}>
@@ -373,7 +375,6 @@ const ExamRegistration = ({ examData }) => {
 
           <Button
             variant="outlined"
-            color="secondary"
             startIcon={<ClearIcon />}
             onClick={clearFilters}
           >
@@ -382,6 +383,9 @@ const ExamRegistration = ({ examData }) => {
         </Box>
 
         <Box display="flex" gap={2}>
+          <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+            Открыть список отчетов
+          </Button>
           <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenModal(null)}>
             Добавить запись
           </Button>
