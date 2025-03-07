@@ -6,9 +6,11 @@ import Layout from "./Components/Standart/Layout/Layout";
 import InstallButton from "./Components/Pages/InstallButton/InstallButton";
 import ExamRegistration from "./Components/Pages/ExamRegistration";
 import { GET_fetchRequest } from "./data";
+import Login from "./Components/Pages/Login";
 
 function App() {
   const [examData, setExamData] = useState(null);
+  const [currentUser, setCurrentUser] = useState(localStorage.getItem('adminAuth'));
 
   useEffect(() => {
     GET_fetchRequest('exam', setExamData);
@@ -17,10 +19,14 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<ExamRegistration examData={examData ? examData : []}/>} />
-          <Route path="*" element={<Non_Found_Page />} />
-        </Route>
+        {!currentUser ? (
+          <Route path="*" element={<Login currentUser={currentUser} setCurrentUser={setCurrentUser} />} />
+        ) : (
+          <Route path="/" element={<Layout />}>
+            <Route index element={<ExamRegistration examData={examData ? examData : []} />} />
+            <Route path="*" element={<Non_Found_Page />} />
+          </Route>
+        )}
       </Routes>
 
       {/* Кнопка установки */}

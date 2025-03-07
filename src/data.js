@@ -4,6 +4,8 @@ export const adress = 'http://192.168.1.173:5000'
 // let adress = 'http://62.217.177.31:5000'
 // let adress = 'https://www.backend.ncsa-lk.ru'
 
+export const admin = { login: "admin", password: 'admin' };
+
 export const GET_fetchRequest = async (name, setRequest) => {
     try {
         const response = await axios.get(`${adress}/api/${name}`);
