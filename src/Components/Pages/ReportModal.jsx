@@ -70,30 +70,27 @@ const ReportModal = ({ open, onClose, data }) => {
                 fourthOrMoreTry,
             },
         }
-        
+
         let result = await POST_fetchRequest(data, 'report');
     };
 
-    const generateReport3 = (filteredData) => {
-        // Оставляем только тех, кто не сдал экзамен
+    const generateReport3 = async (filteredData) => {
         const failedStudents = filteredData.filter(student => !student.passed);
+        const totalStudents = failedStudents.length;
 
-        // Блоки заданий с диапазонами вопросов
         const blocks = {
-            "Русский язык": { range: [0, 8], questionStats: new Array(9).fill(0), hardestQuestions: [] }, // 9 вопросов
-            "История России": { range: [9, 13], questionStats: new Array(5).fill(0), hardestQuestions: [] }, // 5 вопросов
-            "Основы законодательства РФ": { range: [14, 19], questionStats: new Array(6).fill(0), hardestQuestions: [] } // 6 вопросов
+            "Русский язык": { range: [0, 8], questionStats: new Array(9).fill(0), hardestQuestions: [] },
+            "История России": { range: [9, 13], questionStats: new Array(5).fill(0), hardestQuestions: [] },
+            "Основы законодательства РФ": { range: [14, 19], questionStats: new Array(6).fill(0), hardestQuestions: [] }
         };
 
-        // Подсчет правильных ответов в каждом блоке
         failedStudents.forEach(student => {
             Object.keys(blocks).forEach(block => {
                 const [start, end] = blocks[block].range;
 
-                // Считаем правильные ответы для каждого вопроса в блоке
                 student.results.slice(start, end + 1).forEach((answer, index) => {
                     if (answer === 1) {
-                        blocks[block].questionStats[index]++; // Увеличиваем счетчик правильных ответов для вопроса
+                        blocks[block].questionStats[index]++;
                     }
                 });
             });
@@ -106,44 +103,69 @@ const ReportModal = ({ open, onClose, data }) => {
                 .filter(q => q.correct === minCorrectAnswers);
         });
 
-        console.log("\nПолная статистика по блокам:", blocks);
+        // console.log("\nПолная статистика по блокам:", blocks);
+
+        let data = {
+            type: reportType,
+            report: {
+                startDate,
+                endDate,
+                examLevel,
+                totalStudents,
+                blocks
+            },
+        }
+
+        let result = await POST_fetchRequest(data, 'report');
     };
 
-    const generateReport4 = (filteredData) => {
-        // Оставляем только тех, кто не сдал экзамен
+    const generateReport4 = async (filteredData) => {
         const failedStudents = filteredData.filter(student => !student.passed);
-    
-        // Блоки заданий с правильными диапазонами вопросов
+        const totalStudents = failedStudents.length;
+
         const blocks = {
-            "Русский язык": { range: [0, 8], stats: new Array(10).fill(0), questionStats: new Array(9).fill(0), hardestQuestions: [] }, // 9 вопросов
-            "История России": { range: [9, 13], stats: new Array(6).fill(0), questionStats: new Array(5).fill(0), hardestQuestions: [] }, // 5 вопросов
-            "Основы законодательства РФ": { range: [14, 19], stats: new Array(7).fill(0), questionStats: new Array(6).fill(0), hardestQuestions: [] } // 6 вопросов
+            "Русский язык": { range: [0, 8], stats: new Array(10).fill(0), questionStats: new Array(9).fill(0), hardestQuestions: [] }, 
+            "История России": { range: [9, 13], stats: new Array(6).fill(0), questionStats: new Array(5).fill(0), hardestQuestions: [] },
+            "Основы законодательства РФ": { range: [14, 19], stats: new Array(7).fill(0), questionStats: new Array(6).fill(0), hardestQuestions: [] } 
         };
-    
-        // Подсчитываем, сколько правильных ответов в каждом блоке
+
         failedStudents.forEach(student => {
             Object.keys(blocks).forEach(block => {
                 const [start, end] = blocks[block].range;
                 const correctAnswers = student.results.slice(start, end + 1).filter(answer => answer === 1).length;
                 blocks[block].stats[correctAnswers]++;
-    
-                // Подсчет правильных ответов по конкретным вопросам в блоке
+
                 student.results.slice(start, end + 1).forEach((answer, index) => {
                     if (answer === 1) {
-                        blocks[block].questionStats[index]++; // Увеличиваем счетчик правильных ответов для вопроса
+                        blocks[block].questionStats[index]++;
                     }
                 });
             });
         });
-    
+
         Object.keys(blocks).forEach(block => {
             const minCorrectAnswers = Math.min(...blocks[block].questionStats);
             blocks[block].hardestQuestions = blocks[block].questionStats
                 .map((count, index) => ({ question: index + blocks[block].range[0] + 1, correct: count }))
                 .filter(q => q.correct === minCorrectAnswers);
         });
-    
-        console.log("\nПолная статистика по блокам:", blocks);
+
+        // console.log("\nПолная статистика по блокам:", blocks);
+
+        let data = {
+            type: reportType,
+            report: {
+                startDate,
+                endDate,
+                examLevel,
+                totalStudents,
+                blocks
+            },
+        }
+
+        // console.log(data.report)
+
+        let result = await POST_fetchRequest(data, 'report');
     };
 
     const handleGenerateReport = () => {
