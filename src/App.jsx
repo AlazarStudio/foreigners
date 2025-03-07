@@ -8,17 +8,17 @@ import ExamRegistration from "./Components/Pages/ExamRegistration";
 import { GET_fetchRequest } from "./data";
 
 function App() {
-  const [groupSchedulesFetch, setGroupSchedulesFetch] = useState(null);
+  const [examData, setExamData] = useState(null);
 
   useEffect(() => {
-    GET_fetchRequest('exam', setGroupSchedulesFetch);
+    GET_fetchRequest('exam', setExamData);
   }, []);
 
   return (
     <>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<ExamRegistration groupSchedulesFetch={groupSchedulesFetch ? groupSchedulesFetch : []}/>} />
+          <Route index element={<ExamRegistration examData={examData ? examData : []}/>} />
           <Route path="*" element={<Non_Found_Page />} />
         </Route>
       </Routes>

@@ -1,19 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, FormControlLabel, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Checkbox, Autocomplete } from '@mui/material';
 import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
+
+import ExamResultsModal from './ExamResultsModal';
+import ReportModal from './ReportModal';
+import ReportsListModal from './ReportsListModal';
+
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ExamResultsModal from './ExamResultsModal';
-import ReportModal from './ReportModal';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
-import InsertChartIcon from '@mui/icons-material/InsertChart';
-import { DELETE_fetchRequest, POST_fetchRequest, PUT_fetchRequest } from '../../data';
-// import { examsData } from '../../data';
 
-const ExamRegistration = ({ groupSchedulesFetch }) => {
+import { DELETE_fetchRequest, GET_fetchRequest, POST_fetchRequest, PUT_fetchRequest, adress } from '../../data';
+
+const ExamRegistration = ({ examData }) => {
   const [data, setData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openResultsModal, setOpenResultsModal] = useState(false); // Состояние для открытия модального окна с результатами
@@ -24,8 +26,8 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
   const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
-    setData(groupSchedulesFetch)
-  }, [groupSchedulesFetch]);
+    setData(examData)
+  }, [examData]);
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
@@ -311,6 +313,22 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
     }
   };
 
+  const [open, setOpen] = useState(false);
+
+  const [reports, setReports] = useState([]);
+
+  useEffect(() => {
+    GET_fetchRequest('report', setReports);
+  }, [reportModalOpen, open]);
+
+  const handleDeleteReport = async (reportToDelete) => {
+    if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
+      setReports(reports.filter(report => report.id !== reportToDelete));
+
+      await DELETE_fetchRequest(reportToDelete, 'report');
+    }
+  };
+
   return (
     <>
       <Typography display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -318,9 +336,11 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
           <Typography variant="h5">Список записей на экзамен</Typography>
           <Button variant="outline" color="primary" onClick={openMenu} startIcon={<SettingsIcon />}>Настроить колонки</Button>
         </Box>
-        <Button startIcon={<InsertChartIcon />} variant="contained" color="primary" onClick={() => setReportModalOpen(true)}>
-          Создать отчет
+
+        <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+          Открыть список отчетов
         </Button>
+
       </Typography>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} mt={4}>
@@ -584,6 +604,14 @@ const ExamRegistration = ({ groupSchedulesFetch }) => {
           </MenuItem>
         ))}
       </Menu>
+
+      <ReportsListModal
+        open={open}
+        onClose={() => setOpen(false)}
+        reports={reports}
+        onDelete={handleDeleteReport}
+        setReportModalOpen={setReportModalOpen}
+      />
     </>
   );
 };
