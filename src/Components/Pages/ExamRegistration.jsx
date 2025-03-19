@@ -318,9 +318,18 @@ const ExamRegistration = ({ examData }) => {
 
   const [reports, setReports] = useState([]);
 
+  const fetchReports = async () => {
+    try {
+      const reportsData = await GET_fetchRequest('report', setReports);
+    } catch (error) {
+      console.error("Ошибка при загрузке отчетов:", error);
+    }
+  };
+
   useEffect(() => {
-    GET_fetchRequest('report', setReports);
-  }, [reportModalOpen, open, reports]);
+    fetchReports()
+    
+  }, [reportModalOpen, open]);
 
   const handleDeleteReport = async (reportToDelete) => {
     if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
@@ -596,7 +605,7 @@ const ExamRegistration = ({ examData }) => {
       />
 
       {/* Модальное окно для выбора отчета */}
-      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false) } data={data} />
+      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} data={data} fetchReports={fetchReports}/>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
         {Object.keys(visibleColumns).map((key) => (

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { GET_fetchRequest, POST_fetchRequest } from '../../data';
 
-const ReportModal = ({ open, onClose, data }) => {
+const ReportModal = ({ open, onClose, data, fetchReports }) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [examLevel, setExamLevel] = useState('');
@@ -43,6 +43,8 @@ const ReportModal = ({ open, onClose, data }) => {
         }
 
         let result = await POST_fetchRequest(data, 'report');
+
+        fetchReports()
     };
 
     const generateReport2 = async (filteredData) => {
@@ -72,6 +74,8 @@ const ReportModal = ({ open, onClose, data }) => {
         }
 
         let result = await POST_fetchRequest(data, 'report');
+
+        fetchReports()
     };
 
     const generateReport3 = async (filteredData) => {
@@ -117,6 +121,8 @@ const ReportModal = ({ open, onClose, data }) => {
         }
 
         let result = await POST_fetchRequest(data, 'report');
+
+        fetchReports()
     };
 
     const generateReport4 = async (filteredData) => {
@@ -166,6 +172,8 @@ const ReportModal = ({ open, onClose, data }) => {
         // console.log(data.report)
 
         let result = await POST_fetchRequest(data, 'report');
+
+        fetchReports()
     };
 
     const handleGenerateReport = () => {
@@ -185,7 +193,6 @@ const ReportModal = ({ open, onClose, data }) => {
             default:
                 console.log("Неизвестный тип отчета");
         }
-
 
         setStartDate("")
         setEndDate("")
