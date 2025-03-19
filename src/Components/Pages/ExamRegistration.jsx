@@ -320,7 +320,7 @@ const ExamRegistration = ({ examData }) => {
 
   useEffect(() => {
     GET_fetchRequest('report', setReports);
-  }, [reportModalOpen, open]);
+  }, [reportModalOpen, open, reports]);
 
   const handleDeleteReport = async (reportToDelete) => {
     if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
@@ -596,7 +596,7 @@ const ExamRegistration = ({ examData }) => {
       />
 
       {/* Модальное окно для выбора отчета */}
-      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} data={data} />
+      <ReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false) } data={data} />
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
         {Object.keys(visibleColumns).map((key) => (

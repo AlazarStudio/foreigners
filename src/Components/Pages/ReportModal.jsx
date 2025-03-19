@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { POST_fetchRequest } from '../../data';
+import { GET_fetchRequest, POST_fetchRequest } from '../../data';
 
 const ReportModal = ({ open, onClose, data }) => {
     const [startDate, setStartDate] = useState('');
@@ -124,9 +124,9 @@ const ReportModal = ({ open, onClose, data }) => {
         const totalStudents = failedStudents.length;
 
         const blocks = {
-            "Русский язык": { range: [0, 8], stats: new Array(10).fill(0), questionStats: new Array(9).fill(0), hardestQuestions: [] }, 
+            "Русский язык": { range: [0, 8], stats: new Array(10).fill(0), questionStats: new Array(9).fill(0), hardestQuestions: [] },
             "История России": { range: [9, 13], stats: new Array(6).fill(0), questionStats: new Array(5).fill(0), hardestQuestions: [] },
-            "Основы законодательства РФ": { range: [14, 19], stats: new Array(7).fill(0), questionStats: new Array(6).fill(0), hardestQuestions: [] } 
+            "Основы законодательства РФ": { range: [14, 19], stats: new Array(7).fill(0), questionStats: new Array(6).fill(0), hardestQuestions: [] }
         };
 
         failedStudents.forEach(student => {
@@ -186,6 +186,7 @@ const ReportModal = ({ open, onClose, data }) => {
                 console.log("Неизвестный тип отчета");
         }
 
+
         setStartDate("")
         setEndDate("")
         setExamLevel("")
@@ -193,6 +194,7 @@ const ReportModal = ({ open, onClose, data }) => {
 
         onClose();
     };
+
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
